@@ -7,13 +7,25 @@ namespace HomeWork3_ConsoleGame
         private readonly MonsterManager manager = new MonsterManager();
         private bool firstRun = true; // для приветствия только при первом запуске
 
-        // Главное меню
-        public void ShowMainMenu()
+        // Запуск главного цикла меню
+        public void Run()
+        {
+            while (true)
+            {
+                ShowMainMenu();
+                var key = Console.ReadKey(intercept: true);
+                if (HandleMainMenuKey(key))
+                    break; // выход из приложения
+            }
+        }
+
+        // Главное меню (только вывод)
+        private void ShowMainMenu()
         {
             Console.Clear();
             if (firstRun)
             {
-                Console.WriteLine("Welcome to My Diablo");
+                Console.WriteLine("Welcome to Monsters and Gaussian damage game");
                 firstRun = false;
             }
             Console.WriteLine();
@@ -23,41 +35,54 @@ namespace HomeWork3_ConsoleGame
             Console.WriteLine("3) Улучшение");
             Console.WriteLine("4) Уничтожение");
             Console.WriteLine("5) Вывод монстров");
-            Console.WriteLine("q) Выход");
+            Console.WriteLine("Q) Выход");
             Console.WriteLine();
-            Console.Write("Выберите пункт: ");
+            Console.Write("Нажмите 1..5 или Q: ");
         }
 
-        // Обработка выбора главного меню
-        public void HandleMainMenuChoice(string input)
+        // Обработка нажатой клавиши в главном меню. Возвращает true если нужно выйти
+        private bool HandleMainMenuKey(ConsoleKeyInfo key)
         {
-            switch (input)
+            switch (key.Key)
             {
-                case "1":
+                case ConsoleKey.D1:
+                case ConsoleKey.NumPad1:
                     ShowSummonMenu();
-                    break;
-                case "2":
+                    return false;
+
+                case ConsoleKey.D2:
+                case ConsoleKey.NumPad2:
                     ShowAttackMenu();
-                    break;
-                case "3":
+                    return false;
+
+                case ConsoleKey.D3:
+                case ConsoleKey.NumPad3:
                     ShowUpgradeMenu();
-                    break;
-                case "4":
+                    return false;
+
+                case ConsoleKey.D4:
+                case ConsoleKey.NumPad4:
                     ShowDestroyMenu();
-                    break;
-                case "5":
+                    return false;
+
+                case ConsoleKey.D5:
+                case ConsoleKey.NumPad5:
                     ViewMonstersMenu();
-                    break;
+                    return false;
+
+                case ConsoleKey.Q:
+                    return true;
+
                 default:
-                    Console.WriteLine("Неверный выбор. Пожалуйста, попробуйте снова.");
-                    Console.WriteLine("Нажмите любую клавишу для продолжения...");
-                    Console.ReadKey();
-                    break;
+                    Console.WriteLine();
+                    Console.WriteLine("Неверный выбор. Нажмите 1..5 или Q.");
+                    System.Threading.Thread.Sleep(600);
+                    return false;
             }
         }
 
-        // Меню призыва монстров
-        public void ShowSummonMenu()
+        // ---------- Призыв ----------
+        private void ShowSummonMenu()
         {
             while (true)
             {
@@ -66,37 +91,42 @@ namespace HomeWork3_ConsoleGame
                 Console.WriteLine("1) Призвать скелета");
                 Console.WriteLine("2) Призвать зомби");
                 Console.WriteLine("3) Призвать призрака");
-                Console.WriteLine("b) Назад в главное меню");
+                Console.WriteLine("B) Назад");
                 Console.WriteLine();
-                Console.Write("Выберите вариант: ");
+                Console.Write("Нажмите 1/2/3 или B: ");
 
-                string choice = Console.ReadLine().Trim().ToLower();
+                var key = Console.ReadKey(intercept: true);
 
-                switch (choice)
+                switch (key.Key)
                 {
-                    case "1":
+                    case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
                         manager.AddSkeleton();
+                        PauseShort();
                         break;
-                    case "2":
+                    case ConsoleKey.D2:
+                    case ConsoleKey.NumPad2:
                         manager.AddZombie();
+                        PauseShort();
                         break;
-                    case "3":
+                    case ConsoleKey.D3:
+                    case ConsoleKey.NumPad3:
                         manager.AddGhost();
+                        PauseShort();
                         break;
-                    case "b":
+                    case ConsoleKey.B:
                         return;
                     default:
-                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        Console.WriteLine();
+                        Console.WriteLine("Неверный выбор.");
+                        System.Threading.Thread.Sleep(400);
                         break;
                 }
-
-                Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                Console.ReadKey();
             }
         }
 
-        // Меню атаки
-        public void ShowAttackMenu()
+        // ---------- Атака ----------
+        private void ShowAttackMenu()
         {
             while (true)
             {
@@ -104,15 +134,17 @@ namespace HomeWork3_ConsoleGame
                 Console.WriteLine("=== Атака ===");
                 Console.WriteLine("1) Нанести урон выбранному монстру (по id)");
                 Console.WriteLine("2) Нанести урон случайному монстру");
-                Console.WriteLine("b) Назад в главное меню");
+                Console.WriteLine("B) Назад");
                 Console.WriteLine();
-                Console.Write("Выберите вариант: ");
+                Console.Write("Нажмите 1/2 или B: ");
 
-                string choice = Console.ReadLine().Trim().ToLower();
+                var key = Console.ReadKey(intercept: true);
 
-                switch (choice)
+                switch (key.Key)
                 {
-                    case "1":
+                    case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
+                        Console.WriteLine();
                         Console.Write("Введите id монстра: ");
                         string idStr = Console.ReadLine().Trim();
                         Console.Write("Введите величину урона: ");
@@ -121,32 +153,35 @@ namespace HomeWork3_ConsoleGame
                             manager.DamageById(id, dmg);
                         else
                             Console.WriteLine("Неверные данные.");
+                        PauseShort();
                         break;
 
-                    case "2":
+                    case ConsoleKey.D2:
+                    case ConsoleKey.NumPad2:
+                        Console.WriteLine();
                         Console.Write("Введите величину урона: ");
                         string dmgRandom = Console.ReadLine().Trim();
                         if (int.TryParse(dmgRandom, out int dmgR))
                             manager.DamageRandom(dmgR);
                         else
                             Console.WriteLine("Неверные данные.");
+                        PauseShort();
                         break;
 
-                    case "b":
+                    case ConsoleKey.B:
                         return;
 
                     default:
-                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        Console.WriteLine();
+                        Console.WriteLine("Неверный выбор.");
+                        System.Threading.Thread.Sleep(400);
                         break;
                 }
-
-                Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                Console.ReadKey();
             }
         }
 
-        // Меню апгрейдов
-        public void ShowUpgradeMenu()
+        // ---------- Апгрейд ----------
+        private void ShowUpgradeMenu()
         {
             while (true)
             {
@@ -154,15 +189,17 @@ namespace HomeWork3_ConsoleGame
                 Console.WriteLine("=== Улучшение монстра ===");
                 Console.WriteLine("1) Улучшить броню (по id)");
                 Console.WriteLine("2) Добавить шанс невидимости (по id)");
-                Console.WriteLine("b) Назад в главное меню");
+                Console.WriteLine("B) Назад");
                 Console.WriteLine();
-                Console.Write("Выберите вариант: ");
+                Console.Write("Нажмите 1/2 или B: ");
 
-                string choice = Console.ReadLine().Trim().ToLower();
+                var key = Console.ReadKey(intercept: true);
 
-                switch (choice)
+                switch (key.Key)
                 {
-                    case "1":
+                    case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
+                        Console.WriteLine();
                         Console.Write("Введите id монстра для апгрейда: ");
                         string idArmor = Console.ReadLine().Trim();
                         Console.Write("Укажите процент брони для добавления (0-90): ");
@@ -171,9 +208,12 @@ namespace HomeWork3_ConsoleGame
                             manager.UpgradeArmor(idA, valueA);
                         else
                             Console.WriteLine("Неверные данные.");
+                        PauseShort();
                         break;
 
-                    case "2":
+                    case ConsoleKey.D2:
+                    case ConsoleKey.NumPad2:
+                        Console.WriteLine();
                         Console.Write("Введите id монстра для апгрейда: ");
                         string idInv = Console.ReadLine().Trim();
                         Console.Write("Укажите процент шанса невидимости (0-95): ");
@@ -182,61 +222,63 @@ namespace HomeWork3_ConsoleGame
                             manager.UpgradeInvisibility(idI, valueI);
                         else
                             Console.WriteLine("Неверные данные.");
+                        PauseShort();
                         break;
 
-                    case "b":
+                    case ConsoleKey.B:
                         return;
 
                     default:
-                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        Console.WriteLine();
+                        Console.WriteLine("Неверный выбор.");
+                        System.Threading.Thread.Sleep(400);
                         break;
                 }
-
-                Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                Console.ReadKey();
             }
         }
 
-        // Меню удаления монстра
-        public void ShowDestroyMenu()
+        // ---------- Удаление ----------
+        private void ShowDestroyMenu()
         {
             while (true)
             {
                 Console.Clear();
                 Console.WriteLine("=== Уничтожение монстра ===");
                 Console.WriteLine("1) Уничтожить монстра по id");
-                Console.WriteLine("b) Назад в главное меню");
+                Console.WriteLine("B) Назад");
                 Console.WriteLine();
-                Console.Write("Выберите вариант: ");
+                Console.Write("Нажмите 1 или B: ");
 
-                string choice = Console.ReadLine().Trim().ToLower();
+                var key = Console.ReadKey(intercept: true);
 
-                switch (choice)
+                switch (key.Key)
                 {
-                    case "1":
+                    case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
+                        Console.WriteLine();
                         Console.Write("Введите id монстра для удаления: ");
                         string idDel = Console.ReadLine().Trim();
                         if (int.TryParse(idDel, out int idD))
                             manager.DeleteById(idD);
                         else
                             Console.WriteLine("Неверные данные.");
+                        PauseShort();
                         break;
 
-                    case "b":
+                    case ConsoleKey.B:
                         return;
 
                     default:
-                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        Console.WriteLine();
+                        Console.WriteLine("Неверный выбор.");
+                        System.Threading.Thread.Sleep(400);
                         break;
                 }
-
-                Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                Console.ReadKey();
             }
         }
 
-        // Меню просмотра монстров
-        public void ViewMonstersMenu()
+        // ---------- Просмотр ----------
+        private void ViewMonstersMenu()
         {
             while (true)
             {
@@ -244,30 +286,48 @@ namespace HomeWork3_ConsoleGame
                 Console.WriteLine("=== Список монстров ===");
                 Console.WriteLine("1) Показать краткую информацию обо всех монстрах");
                 Console.WriteLine("2) Показать подробную информацию обо всех монстрах");
-                Console.WriteLine("b) Назад в главное меню");
+                Console.WriteLine("B) Назад");
                 Console.WriteLine();
-                Console.Write("Выберите вариант: ");
+                Console.Write("Нажмите 1/2 или B: ");
 
-                string choice = Console.ReadLine().Trim().ToLower();
+                var key = Console.ReadKey(intercept: true);
 
-                switch (choice)
+                switch (key.Key)
                 {
-                    case "1":
+                    case ConsoleKey.D1:
+                    case ConsoleKey.NumPad1:
+                        Console.WriteLine();
                         manager.PrintAllShort();
+                        Console.WriteLine();
+                        Console.WriteLine("Нажмите любую клавишу, чтобы вернуться...");
+                        Console.ReadKey(intercept: true); // дождаться любой клавиши
                         break;
-                    case "2":
+
+                    case ConsoleKey.D2:
+                    case ConsoleKey.NumPad2:
+                        Console.WriteLine();
                         manager.PrintAllDetailed();
+                        Console.WriteLine();
+                        Console.WriteLine("Нажмите любую клавишу, чтобы вернуться...");
+                        Console.ReadKey(intercept: true); // дождаться любой клавиши
                         break;
-                    case "b":
+
+                    case ConsoleKey.B:
                         return;
+
                     default:
-                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        Console.WriteLine();
+                        Console.WriteLine("Неверный выбор.");
+                        System.Threading.Thread.Sleep(400);
                         break;
                 }
-
-                Console.WriteLine("\nНажмите любую клавишу для продолжения...");
-                Console.ReadKey();
             }
+        }
+
+        // Небольшая пауза, чтобы пользователь успел прочитать сообщение
+        private void PauseShort()
+        {
+            System.Threading.Thread.Sleep(1500); // 1.5 секунды
         }
     }
 }
