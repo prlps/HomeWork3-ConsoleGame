@@ -8,5 +8,6 @@ namespace HomeWork3_ConsoleGame
 {
     internal class Monster
     {
+
     }
 }
