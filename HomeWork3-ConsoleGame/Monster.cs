@@ -69,5 +69,20 @@ namespace HomeWork3_ConsoleGame
 
         }
 
+        // Добавление брони
+        public void UpgradeArmor(int value)
+        {
+            Armor += value;
+            Console.WriteLine($"{Type} {(Name != "" ? Name : "")} получил {value} брони. Сейчас броня: {Armor}");
+        }
+
+        // Добавление шанса невидимости
+        public void UpgradeInvisibility(int value)
+        {
+            InvisibilityChance += value;
+            if (InvisibilityChance > 100) InvisibilityChance = 100;
+            Console.WriteLine($"{Type} {(Name != "" ? Name : "")} получил {value}% шанса невидимости. Сейчас: {InvisibilityChance}%");
+        }
+
     }
 }
