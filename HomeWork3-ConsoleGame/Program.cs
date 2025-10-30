@@ -4,7 +4,20 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+
+            Menu menu = new Menu();
+
+            while (true)
+            {
+                menu.ShowMainMenu(); // вывод меню
+                string choice = Console.ReadLine().Trim().ToLower(); // считываем ввод
+
+                if (choice == "q") break; // выход
+
+                menu.HandleMainMenuChoice(choice); // обрабатываем выбор
+            }
+
+
         }
     }
 }
