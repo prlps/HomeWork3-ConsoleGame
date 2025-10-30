@@ -4,11 +4,18 @@ namespace HomeWork3_ConsoleGame
 {
     internal class Menu
     {
+        private readonly MonsterManager manager = new MonsterManager();
+        private bool firstRun = true; // для приветствия только при первом запуске
+
         // Главное меню
         public void ShowMainMenu()
         {
-            Console.Clear(); // очищаем консоль перед выводом
-            Console.WriteLine("Welcome to My Diablo"); // приветственное сообщение. TODO: показывать только при первом запуске
+            Console.Clear();
+            if (firstRun)
+            {
+                Console.WriteLine("Welcome to My Diablo");
+                firstRun = false;
+            }
             Console.WriteLine();
             Console.WriteLine("Главное меню:");
             Console.WriteLine("1) Призвать");
@@ -21,7 +28,7 @@ namespace HomeWork3_ConsoleGame
             Console.Write("Выберите пункт: ");
         }
 
-        // Обработка выбора в главном меню
+        // Обработка выбора главного меню
         public void HandleMainMenuChoice(string input)
         {
             switch (input)
@@ -49,7 +56,7 @@ namespace HomeWork3_ConsoleGame
             }
         }
 
-        // Менюшки второго уровня
+        // Меню призыва монстров
         public void ShowSummonMenu()
         {
             while (true)
@@ -68,23 +75,16 @@ namespace HomeWork3_ConsoleGame
                 switch (choice)
                 {
                     case "1":
-                        Console.WriteLine("Скелет призван!");
-                        // TODO: AddSkeleton();
+                        manager.AddSkeleton();
                         break;
-
                     case "2":
-                        Console.WriteLine("Зомби призван!");
-                        // TODO: AddZombie();
+                        manager.AddZombie();
                         break;
-
                     case "3":
-                        Console.WriteLine("Призрак призван!");
-                        // TODO: AddGhost();
+                        manager.AddGhost();
                         break;
-
                     case "b":
-                        return; // выход в главное меню
-
+                        return;
                     default:
                         Console.WriteLine("Неверный выбор. Попробуйте снова.");
                         break;
@@ -95,6 +95,7 @@ namespace HomeWork3_ConsoleGame
             }
         }
 
+        // Меню атаки
         public void ShowAttackMenu()
         {
             while (true)
@@ -114,17 +115,21 @@ namespace HomeWork3_ConsoleGame
                     case "1":
                         Console.Write("Введите id монстра: ");
                         string idStr = Console.ReadLine().Trim();
-                        Console.Write("Введите величину урона (целое число): ");
+                        Console.Write("Введите величину урона: ");
                         string dmgStr = Console.ReadLine().Trim();
-                        Console.WriteLine($"TODO: вызвать DamageById({idStr}, {dmgStr})");
-                        // TODO: парсить id/dmg и вызвать реальную функцию DamageById(id, dmg);
+                        if (int.TryParse(idStr, out int id) && int.TryParse(dmgStr, out int dmg))
+                            manager.DamageById(id, dmg);
+                        else
+                            Console.WriteLine("Неверные данные.");
                         break;
 
                     case "2":
-                        Console.Write("Введите величину урона (целое число): ");
+                        Console.Write("Введите величину урона: ");
                         string dmgRandom = Console.ReadLine().Trim();
-                        Console.WriteLine($"TODO: вызвать DamageRandom({dmgRandom})");
-                        // TODO: парсить dmgRandom и вызвать реальную функцию DamageRandom(dmg);
+                        if (int.TryParse(dmgRandom, out int dmgR))
+                            manager.DamageRandom(dmgR);
+                        else
+                            Console.WriteLine("Неверные данные.");
                         break;
 
                     case "b":
@@ -140,6 +145,7 @@ namespace HomeWork3_ConsoleGame
             }
         }
 
+        // Меню апгрейдов
         public void ShowUpgradeMenu()
         {
             while (true)
@@ -161,17 +167,21 @@ namespace HomeWork3_ConsoleGame
                         string idArmor = Console.ReadLine().Trim();
                         Console.Write("Укажите процент брони для добавления (0-90): ");
                         string addArmor = Console.ReadLine().Trim();
-                        Console.WriteLine($"TODO: вызвать UpgradeArmor({idArmor}, {addArmor})");
-                        // TODO: парсить и вызывать UpgradeArmor(id, value)
+                        if (int.TryParse(idArmor, out int idA) && int.TryParse(addArmor, out int valueA))
+                            manager.UpgradeArmor(idA, valueA);
+                        else
+                            Console.WriteLine("Неверные данные.");
                         break;
 
                     case "2":
                         Console.Write("Введите id монстра для апгрейда: ");
                         string idInv = Console.ReadLine().Trim();
-                        Console.Write("Укажите процент шанса невидимости для добавления (0-95): ");
+                        Console.Write("Укажите процент шанса невидимости (0-95): ");
                         string addInv = Console.ReadLine().Trim();
-                        Console.WriteLine($"TODO: вызвать UpgradeInvisibility({idInv}, {addInv})");
-                        // TODO: парсить и вызывать UpgradeInvisibility(id, value)
+                        if (int.TryParse(idInv, out int idI) && int.TryParse(addInv, out int valueI))
+                            manager.UpgradeInvisibility(idI, valueI);
+                        else
+                            Console.WriteLine("Неверные данные.");
                         break;
 
                     case "b":
@@ -187,6 +197,7 @@ namespace HomeWork3_ConsoleGame
             }
         }
 
+        // Меню удаления монстра
         public void ShowDestroyMenu()
         {
             while (true)
@@ -205,8 +216,10 @@ namespace HomeWork3_ConsoleGame
                     case "1":
                         Console.Write("Введите id монстра для удаления: ");
                         string idDel = Console.ReadLine().Trim();
-                        Console.WriteLine($"TODO: вызвать DeleteById({idDel})");
-                        // TODO: парсить id и вызывать DeleteById(id)
+                        if (int.TryParse(idDel, out int idD))
+                            manager.DeleteById(idD);
+                        else
+                            Console.WriteLine("Неверные данные.");
                         break;
 
                     case "b":
@@ -222,6 +235,7 @@ namespace HomeWork3_ConsoleGame
             }
         }
 
+        // Меню просмотра монстров
         public void ViewMonstersMenu()
         {
             while (true)
@@ -239,18 +253,13 @@ namespace HomeWork3_ConsoleGame
                 switch (choice)
                 {
                     case "1":
-                        Console.WriteLine("TODO: вызвать PrintAllShort()");
-                        // TODO: PrintAllShort();
+                        manager.PrintAllShort();
                         break;
-
                     case "2":
-                        Console.WriteLine("TODO: вызвать PrintAllDetailed()");
-                        // TODO: PrintAllDetailed();
+                        manager.PrintAllDetailed();
                         break;
-
                     case "b":
                         return;
-
                     default:
                         Console.WriteLine("Неверный выбор. Попробуйте снова.");
                         break;

@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeWork3_ConsoleGame
 {
     internal class Monster
     {
-        public string Name { get; set; }      // имя монстра, может быть пустым
-        public string Type { get; private set; }   // Скелет, Зомби, Призрак
-        public int Health { get; private set; }    // жизни
-        public bool IsFlying { get; private set; } // летает или нет
-        public int Armor { get; private set; }     // уменьшает получаемый урон
-        public int InvisibilityChance { get; private set; } // % шанс избежать урона
+        public int Id { get; set; }                         // назначается менеджером
+        public string Name { get; set; }                    // имя (может быть пустым)
+        public string Type { get; private set; }            // тип: Скелет/Зомби/Призрак
+        public int Health { get; private set; }             // жизни
+        public bool IsFlying { get; private set; }          // летает или нет
+        public int Armor { get; private set; }              // броня в процентах
+        public int InvisibilityChance { get; private set; } // шанс увернуться в процентах (0-100)
 
         // Конструктор
         public Monster(string type, int health = 100, bool isFlying = false, string name = "")
@@ -21,68 +18,77 @@ namespace HomeWork3_ConsoleGame
             Type = type;
             Health = health;
             IsFlying = isFlying;
-            Name = name;
+            Name = name ?? string.Empty;
             Armor = 0;
             InvisibilityChance = 0;
         }
 
-        // Метод движения
+        // Читаемое представление типа + имени
+        public string NameOrType()
+        {
+            return string.IsNullOrWhiteSpace(Name) ? Type : $"{Type} '{Name}'";
+        }
+
+        // Движение
         public string Move()
         {
             return IsFlying ? "Летает" : "По земле";
         }
 
-        // Получение урона с учётом брони и невидимости
+        // Рассчитать эффективность урона с учётом брони (без влияния невидимости)
+        public int CalculateEffectiveDamage(int incoming)
+        {
+            int effective = incoming - (incoming * Armor / 100);
+            return Math.Max(0, effective);
+        }
+
+        // Получение урона: смешанное распределение урона + проверка невидимости + броня
         public void TakeDamage(int baseDamage)
         {
-            Random rnd = new Random();
-            int chance = rnd.Next(0, 100);
-
-            // Проверяем невидимость
-            if (chance < InvisibilityChance)
+            // Проверка невидимости (равномерное распределение 0..99)
+            int roll = RandomHelper.NextInt(0, 100);
+            if (roll < InvisibilityChance)
             {
-                Console.WriteLine($"{Type} {(Name != "" ? Name : "")} увернулся от атаки!");
+                Console.WriteLine($"{NameOrType()} увернулся от атаки (roll={roll} < {InvisibilityChance}).");
                 return;
             }
 
             // Генерируем фактический урон по смешанному распределению
             int damage = RandomHelper.NormalMixture(
                 mean: baseDamage,
-                stddev: baseDamage * 0.15, //Среднее отклонение
+                stddev: Math.Max(1.0, baseDamage * 0.15), // stddev не ноль
                 min: 0,
-                max: baseDamage * 2,
-                extremeProb: 0.08 // 8% шанс экстремального удара
+                max: Math.Max(baseDamage, baseDamage * 2),
+                extremeProb: 0.08 // 8% шанс экстремала
             );
 
-            // Учитываем броню
-            int effectiveDamage = damage - (damage * Armor / 100);
-            if (effectiveDamage < 0) effectiveDamage = 0;
-
+            int effectiveDamage = CalculateEffectiveDamage(damage);
             Health -= effectiveDamage;
+            if (Health < 0) Health = 0;
 
-            Console.WriteLine($"{Type} {(Name != "" ? Name : "")} получил {effectiveDamage} урона (из {damage} до брони), осталось {Health} HP.");
+            Console.WriteLine($"{NameOrType()} получил {effectiveDamage} урона (из {damage} до брони). Осталось {Health} HP.");
 
             if (Health <= 0)
             {
-                Console.WriteLine($"{Type} {(Name != "" ? Name : "")} погиб!");
+                Console.WriteLine($"{NameOrType()} погиб!");
             }
-
         }
 
-        // Добавление брони
+        // Апгрейды
         public void UpgradeArmor(int value)
         {
+            if (value <= 0) return;
             Armor += value;
-            Console.WriteLine($"{Type} {(Name != "" ? Name : "")} получил {value} брони. Сейчас броня: {Armor}");
+            if (Armor > 90) Armor = 90; // защита сверху ограничена
+            Console.WriteLine($"{NameOrType()} получил +{value}% брони. Текущая броня: {Armor}%.");
         }
 
-        // Добавление шанса невидимости
         public void UpgradeInvisibility(int value)
         {
+            if (value <= 0) return;
             InvisibilityChance += value;
-            if (InvisibilityChance > 100) InvisibilityChance = 100;
-            Console.WriteLine($"{Type} {(Name != "" ? Name : "")} получил {value}% шанса невидимости. Сейчас: {InvisibilityChance}%");
+            if (InvisibilityChance > 95) InvisibilityChance = 95; // ограничение сверху
+            Console.WriteLine($"{NameOrType()} получил +{value}% к шансу невидимости. Сейчас: {InvisibilityChance}%.");
         }
-
     }
 }
