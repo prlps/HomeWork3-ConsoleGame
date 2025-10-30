@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeWork3_ConsoleGame
 {
@@ -13,6 +9,7 @@ namespace HomeWork3_ConsoleGame
         public static int NextInt(int minInclusive, int maxExclusive) => rnd.Next(minInclusive, maxExclusive);
         public static double NextDouble() => rnd.NextDouble();
 
+        // Нормальное распределение, ограниченное min/max
         public static int NormalClamped(int mean, double stddev, int min, int max)
         {
             double u1 = 1.0 - rnd.NextDouble();
@@ -22,12 +19,14 @@ namespace HomeWork3_ConsoleGame
             return Math.Clamp(value, min, max);
         }
 
-        public static int NormalMixture(int mean, double stddev, int min, int max, double extremeProb = 0.08)
+        // Нормальное с критическим шансом
+        public static int NormalWithCrit(int mean, double stddev, int min, int max, double critProb = 0.08, double critMultiplier = 2.0)
         {
-            if (rnd.NextDouble() < extremeProb)
+            if (rnd.NextDouble() < critProb)
             {
-                // экстремум: равномерно в диапазоне (можно изменить логику)
-                return rnd.Next(min, max + 1);
+                // Критический удар: множим среднее на critMultiplier, потом clamp
+                int critDamage = (int)Math.Round(mean * critMultiplier);
+                return Math.Clamp(critDamage, min, max);
             }
             return NormalClamped(mean, stddev, min, max);
         }

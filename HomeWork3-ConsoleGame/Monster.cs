@@ -45,7 +45,7 @@ namespace HomeWork3_ConsoleGame
         // Получение урона: смешанное распределение урона + проверка невидимости + броня
         public void TakeDamage(int baseDamage)
         {
-            // Проверка невидимости (равномерное распределение 0..99)
+            // Проверка невидимости
             int roll = RandomHelper.NextInt(0, 100);
             if (roll < InvisibilityChance)
             {
@@ -53,25 +53,25 @@ namespace HomeWork3_ConsoleGame
                 return;
             }
 
-            // Генерируем фактический урон по смешанному распределению
-            int damage = RandomHelper.NormalMixture(
+            // Генерируем фактический урон с возможностью крита
+            int damage = RandomHelper.NormalWithCrit(
                 mean: baseDamage,
-                stddev: Math.Max(1.0, baseDamage * 0.15), // stddev не ноль
+                stddev: Math.Max(1.0, baseDamage * 0.15),
                 min: 0,
                 max: Math.Max(baseDamage, baseDamage * 2),
-                extremeProb: 0.08 // 8% шанс экстремала
+                critProb: 0.08,
+                critMultiplier: 2.0
             );
 
             int effectiveDamage = CalculateEffectiveDamage(damage);
             Health -= effectiveDamage;
             if (Health < 0) Health = 0;
 
+            // Выводим инфу
             Console.WriteLine($"{NameOrType()} получил {effectiveDamage} урона (из {damage} до брони). Осталось {Health} HP.");
 
             if (Health <= 0)
-            {
                 Console.WriteLine($"{NameOrType()} погиб!");
-            }
         }
 
         // Апгрейды
